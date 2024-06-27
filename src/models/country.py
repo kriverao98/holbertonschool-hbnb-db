@@ -2,6 +2,7 @@
 Country related functionality
 """
 
+from src import db
 
 class Country:
     """
@@ -11,10 +12,13 @@ class Country:
 
     This class is used to get and list countries
     """
+    
+    __tablename__ = 'countries'
 
-    name: str
-    code: str
-    cities: list
+    name = db.Column(db.String(100), nullable=False)
+    code = db.Column(db.String(10), unique=True, nullable=False)
+
+    cities = db.relationship('City', backref='country', lazy=True)
 
     def __init__(self, name: str, code: str, **kw) -> None:
         """Dummy init"""

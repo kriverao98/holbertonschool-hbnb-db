@@ -2,6 +2,7 @@
 Review related functionality
 """
 
+from src import db
 from src.models.base import Base
 from src.models.place import Place
 from src.models.user import User
@@ -10,10 +11,15 @@ from src.models.user import User
 class Review(Base):
     """Review representation"""
 
-    place_id: str
-    user_id: str
-    comment: str
-    rating: float
+    __tablename__ = 'reviews'
+
+    place_id = db.Column(db.String(50), db.ForeignKey('places.id'), nullable=False)
+    user_id = db.Column(db.String(50), db.ForeignKey('users.id'), nullable=False)
+    comment = db.Column(db.String(200))
+    rating = db.Column(db.Float)
+
+    place = db.relationship('Place', backref=db.backref('reviews', lazy=True))
+    user = db.relationship('User', backref=db.backref('reviews', lazy=True))
 
     def __init__(
         self, place_id: str, user_id: str, comment: str, rating: float, **kw

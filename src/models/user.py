@@ -8,10 +8,10 @@ from src import db
 
 class User(Base):
     """User representation"""
-    
+
     __tablename__ = 'users'
-    
-    id = db.Column(db.String(36), primary_key=True)
+
+    id = db.Column(db.String(50), primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)

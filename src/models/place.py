@@ -1,7 +1,7 @@
 """
 Place related functionality
 """
-
+from src import db
 from src.models.base import Base
 from src.models.city import City
 from src.models.user import User
@@ -10,17 +10,22 @@ from src.models.user import User
 class Place(Base):
     """Place representation"""
 
-    name: str
-    description: str
-    address: str
-    latitude: float
-    longitude: float
-    host_id: str
-    city_id: str
-    price_per_night: int
-    number_of_rooms: int
-    number_of_bathrooms: int
-    max_guests: int
+    __tablename__ = 'places'
+
+    name = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.String(200))
+    address = db.Column(db.String(200))
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+    host_id = db.Column(db.String(50), db.ForeignKey('users.id'), nullable=False)
+    city_id = db.Column(db.String(50), db.ForeignKey('cities.id'), nullable=False)
+    price_per_night = db.Column(db.Integer)
+    number_of_rooms = db.Column(db.Integer)
+    number_of_bathrooms = db.Column(db.Integer)
+    max_guests = db.Column(db.Integer)
+
+    host = db.relationship('User', backref=db.backref('places', lazy=True))
+    city = db.relationship('City', backref=db.backref('places', lazy=True))
 
     def __init__(self, data: dict | None = None, **kw) -> None:
         """Dummy init"""
