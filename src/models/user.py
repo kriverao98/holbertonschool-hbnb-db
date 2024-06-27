@@ -3,14 +3,20 @@ User related functionality
 """
 
 from src.models.base import Base
+from src import db
 
 
 class User(Base):
     """User representation"""
-
-    email: str
-    first_name: str
-    last_name: str
+    
+    __tablename__ = 'users'
+    
+    id = db.Column(db.String(36), primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, onupdate=db.func.current_timestamp())
 
     def __init__(self, email: str, first_name: str, last_name: str, **kw):
         """Dummy init"""
