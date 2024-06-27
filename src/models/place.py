@@ -72,30 +72,26 @@ class Place(Base):
     @staticmethod
     def create(data: dict) -> "Place":
         """Create a new place"""
-        from src.persistence import repo
-
-        user: User | None = User.get(data["host_id"])
+        user = User.query.get(data["host_id"])
 
         if not user:
             raise ValueError(f"User with ID {data['host_id']} not found")
 
-        city: City | None = City.get(data["city_id"])
+        city = City.query.get(data["city_id"])
 
         if not city:
             raise ValueError(f"City with ID {data['city_id']} not found")
 
         new_place = Place(data=data)
-
-        repo.save(new_place)
+        db.session.add(new_place)
+        db.session.commit()
 
         return new_place
 
     @staticmethod
     def update(place_id: str, data: dict) -> "Place | None":
         """Update an existing place"""
-        from src.persistence import repo
-
-        place: Place | None = Place.get(place_id)
+        place = Place.query.get(place_id)
 
         if not place:
             return None
@@ -103,6 +99,6 @@ class Place(Base):
         for key, value in data.items():
             setattr(place, key, value)
 
-        repo.update(place)
+        db.session.commit()
 
         return place

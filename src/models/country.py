@@ -15,6 +15,7 @@ class Country:
     
     __tablename__ = 'countries'
 
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     code = db.Column(db.String(10), unique=True, nullable=False)
 
@@ -33,6 +34,7 @@ class Country:
     def to_dict(self) -> dict:
         """Returns the dictionary representation of the country"""
         return {
+            "id": self.id,
             "name": self.name,
             "code": self.code,
         }
@@ -40,27 +42,18 @@ class Country:
     @staticmethod
     def get_all() -> list["Country"]:
         """Get all countries"""
-        from src.persistence import repo
-
-        countries: list["Country"] = repo.get_all("country")
-
-        return countries
+        return Country.query.all()
 
     @staticmethod
     def get(code: str) -> "Country | None":
         """Get a country by its code"""
-        for country in Country.get_all():
-            if country.code == code:
-                return country
-        return None
+        return Country.query.filter_by(code=code).first()
 
     @staticmethod
     def create(name: str, code: str) -> "Country":
         """Create a new country"""
-        from src.persistence import repo
-
-        country = Country(name, code)
-
-        repo.save(country)
+        country = Country(name=name, code=code)
+        db.session.add(country)
+        db.session.commit()
 
         return country

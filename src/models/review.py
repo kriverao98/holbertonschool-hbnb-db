@@ -51,37 +51,33 @@ class Review(Base):
     @staticmethod
     def create(data: dict) -> "Review":
         """Create a new review"""
-        from src.persistence import repo
-
-        user: User | None = User.get(data["user_id"])
+        user = User.query.get(data["user_id"])
 
         if not user:
             raise ValueError(f"User with ID {data['user_id']} not found")
 
-        place: Place | None = Place.get(data["place_id"])
+        place = Place.query.get(data["place_id"])
 
         if not place:
             raise ValueError(f"Place with ID {data['place_id']} not found")
 
         new_review = Review(**data)
-
-        repo.save(new_review)
+        db.session.add(new_review)
+        db.session.commit()
 
         return new_review
 
     @staticmethod
     def update(review_id: str, data: dict) -> "Review | None":
         """Update an existing review"""
-        from src.persistence import repo
-
-        review = Review.get(review_id)
+        review = Review.query.get(review_id)
 
         if not review:
-            raise ValueError("Review not found")
+            return None
 
         for key, value in data.items():
             setattr(review, key, value)
 
-        repo.update(review)
+        db.session.commit()
 
         return review

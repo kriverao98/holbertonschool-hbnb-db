@@ -2,15 +2,19 @@
 City related functionality
 """
 
+from src import db
 from src.models.base import Base
 from src.models.country import Country
 
 
 class City(Base):
     """City representation"""
+    
+    __tablename__ = 'cities'
 
-    name: str
-    country_code: str
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    country_code = db.Column(db.String(10), db.ForeignKey('countries.code'), nullable=False)
 
     def __init__(self, name: str, country_code: str, **kw) -> None:
         """Dummy init"""
@@ -36,32 +40,24 @@ class City(Base):
     @staticmethod
     def create(data: dict) -> "City":
         """Create a new city"""
-        from src.persistence import repo
-
-        country = Country.get(data["country_code"])
-
+        country = Country.query.filter_by(code=data["country_code"]).first()
+        
         if not country:
             raise ValueError("Country not found")
 
         city = City(**data)
-
-        repo.save(city)
-
+        db.session.add(city)
+        db.session.commit()
         return city
 
     @staticmethod
     def update(city_id: str, data: dict) -> "City":
         """Update an existing city"""
-        from src.persistence import repo
-
-        city = City.get(city_id)
-
+        city = City.query.get(city_id)
         if not city:
             raise ValueError("City not found")
-
         for key, value in data.items():
             setattr(city, key, value)
-
-        repo.update(city)
+        db.session.commit()
 
         return city

@@ -41,29 +41,26 @@ class User(Base):
         }
 
     @staticmethod
-    def create(user: dict) -> "User":
+    def create(user_data: dict) -> "User":
         """Create a new user"""
-        from src.persistence import repo
+        from src import db
 
-        users: list["User"] = User.get_all()
+        existing_user = User.query.filter_by(email=user_data["email"]).first()
+        if existing_user:
+            raise ValueError("User already exists")
 
-        for u in users:
-            if u.email == user["email"]:
-                raise ValueError("User already exists")
-
-        new_user = User(**user)
-
-        repo.save(new_user)
+        new_user = User(**user_data)
+        db.session.add(new_user)
+        db.session.commit()
 
         return new_user
 
     @staticmethod
     def update(user_id: str, data: dict) -> "User | None":
         """Update an existing user"""
-        from src.persistence import repo
+        from src import db
 
-        user: User | None = User.get(user_id)
-
+        user = User.query.get(user_id)
         if not user:
             return None
 
@@ -74,6 +71,6 @@ class User(Base):
         if "last_name" in data:
             user.last_name = data["last_name"]
 
-        repo.update(user)
+        db.session.commit()
 
         return user
