@@ -21,6 +21,8 @@ class Config(ABC):
     TESTING = False
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_DATABASE_URI = os.environ.get('db_url', 'sqlite:///db.db')
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'secret_passkey')
 
 
 class DevelopmentConfig(Config):

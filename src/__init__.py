@@ -3,8 +3,15 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
+from flask_jwt_extended import JWTManager
+from src import Config
+import os
 
 cors = CORS()
+bcrypt = Bcrypt()
+db = SQLAlchemy()
+jwt = JWTManager()
 
 
 def create_app(config_class="src.config.DevelopmentConfig") -> Flask:
@@ -15,9 +22,8 @@ def create_app(config_class="src.config.DevelopmentConfig") -> Flask:
     app = Flask(__name__)
     app.url_map.strict_slashes = False
 
+    app.config.from_object(Config)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.db'
-    
-    db = SQLAlchemy(app)
 
     register_extensions(app)
     register_routes(app)
@@ -29,7 +35,9 @@ def create_app(config_class="src.config.DevelopmentConfig") -> Flask:
 def register_extensions(app: Flask) -> None:
     """Register the extensions for the Flask app"""
     cors.init_app(app, resources={r"/api/*": {"origins": "*"}})
-    # Further extensions can be added here
+    db = SQLAlchemy(app)
+    jwt = JWTManager(app)
+    bcrypt.init_app(app)
 
 
 def register_routes(app: Flask) -> None:
