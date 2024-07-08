@@ -6,7 +6,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from src import Config
-import os
 
 cors = CORS()
 bcrypt = Bcrypt()
@@ -35,8 +34,8 @@ def create_app(config_class="src.config.DevelopmentConfig") -> Flask:
 def register_extensions(app: Flask) -> None:
     """Register the extensions for the Flask app"""
     cors.init_app(app, resources={r"/api/*": {"origins": "*"}})
-    db = SQLAlchemy(app)
-    jwt = JWTManager(app)
+    db.init_app(app)
+    jwt.init_app(app)
     bcrypt.init_app(app)
 
 
